@@ -4,17 +4,20 @@ from pathlib import Path
 
 import pandas as pd
 import json
-import haiku as hk
-import jax
-import jax.numpy as jnp
+# import haiku as hk
+# import jax
+# import jax.numpy as jnp
 
-from nucleotide_transformer.pretrained import get_pretrained_model
-from nucleotide_transformer.tokenizers import FixedSizeNucleotidesKmersTokenizer
+# from nucleotide_transformer.pretrained import get_pretrained_model
+# from nucleotide_transformer.tokenizers import FixedSizeNucleotidesKmersTokenizer
 
 
 DIR = 'Gupta_2017' 
 FILE = 'Gupta_2017/SRR4431764_1_Heavy_Bulk.csv' 
 
+# ------------------------------------------------------------
+# Helper functions
+# ------------------------------------------------------------
 
 def get_label(metadata: dict) -> str:
     if metadata["date"] == "blah":
@@ -35,6 +38,9 @@ def load_data_from_file(filepath: str | Path) -> tuple(pd.DataFrame, dict):
     
     return df, metadata_dict
 
+# ------------------------------------------------------------
+# Data loading classes
+# ------------------------------------------------------------
 
 class BCR:
     """Wrap a B Cell Repetoire"""

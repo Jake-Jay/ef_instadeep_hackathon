@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["hackathon"]
+
+[project]
+name = "hackathon"
+version = "0.0.1"
+authors = [
+    { name = "Team 6", email = "team6@hackathon.com" }
+]
