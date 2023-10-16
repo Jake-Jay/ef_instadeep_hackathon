@@ -29,6 +29,27 @@ metadata_all = load_all_metadata("Gupta_2017")
 from data import load_data_from_file
 import numpy as np
 
+def get_filenames(subject_id, isotype='IGHG'):
+    
+    metadata_all = pd.read_csv("metadata_all.csv")
+    list_subjects = metadata_all['Subject'].unique()
+    n_subjects = len(list_subjects)
+    
+    if subject_id not in list(range(n_subjects)):
+        raise AssertionError(f"Please provide a valid subject_id number to function get_data_subject (between 0 and {n_subjects - 1}, because there are only {n_subjects} subjects)")
+        
+    subject_name = list_subjects[subject_id]
+    
+    metadata_subject = metadata_all[metadata_all["Subject"] == subject_name]
+    
+    # display(metadata_subject)
+    filepaths_subject = metadata_subject['filepath'].tolist()
+    if isotype is not None:
+        metadata_out = metadata_subject[metadata_subject["Isotype"] == isotype]
+    else: 
+        metadata_out = metadata_subject
+    return metadata_out
+
 def get_data_subject(subject_id):
     
     metadata_all = pd.read_csv("metadata_all.csv")
