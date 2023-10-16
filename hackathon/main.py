@@ -15,4 +15,7 @@ if __name__ == "__main__":
         cache_dirpath=None,
     )
 
-    
+    seq, label = bcr[0]
+
+
+

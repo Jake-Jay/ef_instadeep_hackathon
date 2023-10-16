@@ -20,10 +20,10 @@ FILE = 'Gupta_2017/SRR4431764_1_Heavy_Bulk.csv'
 # ------------------------------------------------------------
 
 def get_label(metadata: dict) -> str:
-    if metadata["date"] == "blah":
-        return -1
-    elif metadata["date"] == "blahblah":
+    if metadata["Longitudinal"] == "After-Week-2":
         return 1
+    elif metadata["Longitudinal"] == "blahblah":
+        return -1
     else:
         raise ValueError
 
@@ -34,7 +34,7 @@ def load_data_from_file(filepath: str | Path) -> tuple(pd.DataFrame, dict):
     metadata_dict = json.loads(metadata.replace('""', '"')[1:-2])
     
     df = pd.read_csv(filepath, skiprows=[0])
-    df["label"] = get_label(metadata)
+    df["label"] = get_label(metadata_dict)
     
     return df, metadata_dict
 
@@ -63,7 +63,7 @@ class BCR:
     
     
     def __getitem__(self, idx: int) -> tuple(str, str):
-        return self.data.iloc[idx]["sequence", "label"]
+        return tuple(self.data.iloc[0][["sequence", "label"]])
           
         
 class TokenisedBCR(BCR):
