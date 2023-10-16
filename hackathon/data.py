@@ -4,6 +4,11 @@ from pathlib import Path
 
 import pandas as pd
 import json
+
+
+
+
+# model = AutoModelForMaskedLM.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-1000g")
 # import haiku as hk
 # import jax
 # import jax.numpy as jnp
@@ -48,19 +53,21 @@ class BCR:
     def __init__(
         self,
         filepaths: list[Path | str],
-        cache_dirpath: Path | str,
+        cache_dirpath: Path | str | None = None,
     ) -> None:
         
         self.filepaths = filepaths
 
-        
-        _all_data, _all_metadata = zip(*[
+        _all_data, self.metadata = zip(*[
             load_data_from_file(filepath)
             for filepath in self.filepaths
         ])
 
         self.data = pd.concat(_all_data)
-    
+        self.data["sequence_len"] = self.data["sequence"].apply(len)
+        self.data = self.data.loc[
+            self.data["sequence_len"] > 300   
+        ]
     
     def __getitem__(self, idx: int) -> tuple(str, str):
         return tuple(self.data.iloc[0][["sequence", "label"]])
@@ -71,23 +78,25 @@ class TokenisedBCR(BCR):
     
     def __init__(
         self,
-        filepath: Path | str,
-        cache_dirpath: Path | str,
-        tokeniser,
+        tokeniser,        
+        filepaths: list[Path | str],
+        cache_dirpath: Path | str | None = None,
     ) -> None:
-        super().__init__(filepath, cache_dirpath)
+        super().__init__(filepaths, cache_dirpath)
 
         self.tokeniser = tokeniser
 
-    def __getitem__(self, idx: int) -> str:
-        sequence = super().__getitem__(idx)
+    def __getitem__(self, idx: int) -> dict:
+        """
+        Returns a dictionary with keys:
+        - input_ids
+        - attention_mask
+        - label
+        """
+        sequence, label = super().__getitem__(idx)
+        
+        return {
+            **self.tokeniser(sequence),
+            "label": label,
+        }
 
-
-
-
-
-
-
-
-
-    

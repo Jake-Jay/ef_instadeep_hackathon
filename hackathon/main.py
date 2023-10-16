@@ -2,20 +2,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import numpy as np
-import pandas as pd
+import seaborn as sns
 
-from hackathon.data import BCR
+from transformers import AutoTokenizer
+from data import TokenisedBCR
 
-if __name__ == "__main__":
+filepath = Path("Gupta_2017/SRR4431764_1_Heavy_Bulk.csv")
 
-    filepath = Path("data/SRR4431764_1_Heavy_Bulk.csv")
-    bcr = BCR(
-        filepaths=[filepath],
-        cache_dirpath=None,
-    )
-
-    seq, label = bcr[0]
-
-
-
+tokeniser = AutoTokenizer.from_pretrained("InstaDeepAI/nucleotide-transformer-500m-1000g")
+tokenised_dataset = TokenisedBCR(filepaths=[filepath], tokeniser=tokeniser)
