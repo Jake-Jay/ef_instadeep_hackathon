@@ -1,5 +1,9 @@
+# from @opeltre/revert
+
 import torch
 import torch.nn as nn
+
+from sklearn.manifold import TSNE
 
 class SinkhornKnopp(nn.Module):
     """
@@ -55,4 +59,41 @@ class SinkhornKnopp(nn.Module):
                 U *= (A / T.sum([1]))
                 T = U[:,None] * Q * V       
         return T
-        
+
+#--- Plot Transport plan --- 
+
+def tsne (x, k=2, p=30, N=4000): 
+    mytsne = TSNE(n_components=k, init='pca', perplexity=p,
+                  n_iter=N)
+    return mytsne.fit_transform(x.detach())
+
+import matplotlib.collections as mc
+import pylab
+
+def plot_transport(x_gen, x_true, Pi):
+
+    fig, ax = pylab.subplots(figsize=(20, 15))
+
+    n1, n2 = x_gen.shape[0], x_true.shape[0]
+    i, j = torch.arange(n1).repeat(n2), torch.arange(n2).repeat_interleave(n1)
+    
+    #--- transport density ---
+    edges = torch.stack([x_gen[i], x_true[j]], 1)
+    lw = 1 * Pi.T.flatten() * n1
+    lc = mc.LineCollection(edges, colors='#ffc', linewidths=1.5 * lw)
+    ax.add_collection(lc)
+
+    #---  expected displacement ---
+    A = Pi.sum([1])
+    Pi_x = Pi / A[:,None]
+    i_true = torch.arange(n2).repeat(n1)
+    ys = x_true[i_true].view([n1, n2, 2])
+    ym = (ys * Pi_x[:,:,None]).sum([1])
+    vecs = torch.stack([x_gen, x_gen + .2 * (ym - x_gen)], 1)
+    lc2 = mc.LineCollection(vecs, colors='#dfa', linewidths=.4)
+    ax.add_collection(lc2)
+
+    #--- point clouds ---
+    plt.scatter(x_true[:,0], x_true[:,1], 4, color='#fa3')
+    plt.scatter(x_gen[:,0], x_gen[:,1], 4, color='#2e8')
+    ax.autoscale()
