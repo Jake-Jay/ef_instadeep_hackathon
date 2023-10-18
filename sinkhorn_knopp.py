@@ -2,6 +2,7 @@
 
 import torch
 import torch.nn as nn
+import sklearn
 
 from sklearn.manifold import TSNE
 
@@ -40,8 +41,9 @@ class SinkhornKnopp(nn.Module):
         
         #--- Boundary conditions
         N, M = cdist.shape
-        if isinstance(A, type(None)): A = torch.ones(N) / N
-        if isinstance(B, type(None)): B = torch.ones(M) / M
+        device = cdist.device
+        if isinstance(A, type(None)): A = torch.ones(N, device=device) / N
+        if isinstance(B, type(None)): B = torch.ones(M, device=device) / M
 
         #--- Gibbs density
         C = (cdist - cdist.min()) / (cdist.std())
@@ -52,7 +54,7 @@ class SinkhornKnopp(nn.Module):
         #--- Sinkhorn-Knopp --- 
         with torch.no_grad():
             T = 0. + Q.detach()
-            U, V = torch.ones(N), torch.ones(M)
+            U, V = torch.ones(N, device=device), torch.ones(M, device=device)
             for i in range(n_it):
                 V *= (B / T.sum([0]))
                 T = U[:,None] * Q * V
@@ -67,6 +69,7 @@ def tsne (x, k=2, p=30, N=4000):
                   n_iter=N)
     return mytsne.fit_transform(x.detach())
 
+import matplotlib.pyplot as plt
 import matplotlib.collections as mc
 import pylab
 
